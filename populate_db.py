@@ -3,48 +3,43 @@
 import urllib.request, json
 from pymongo import MongoClient
 import time
-
+import subprocess
 
 print("Server running...")
 
 client = MongoClient('mongodb://localhost/')
-db = client.sensors
+db = client.snmpData
 print("Connected to db...")
-    #print(db.sensors.find_one({'borough':'Bronx'}))
 
-cardiac = db.cardiac
-blood = db.blood
+configs = db.configs
+datas = db.datas
+getSystemInfo = {}
 
-def execute_insert(collection, id_collection):
-    url_json = 'http://nosql.hpeixoto.me/api/sensor/' + id_collection + '00' + str(url_end)
-    print("Inserting from " + url_json)
+def reset_commands():
+    getSystemInfo['UpTime'] = "snmpstatus -c public -v 2c localhost | awk -F 'Up:' '{print $2}'"
+    getSystemInfo['ComputerName'] = "snmpstatus -c public -v 2c localhost | awk -F 'UDP:' '{print $2}' | awk '{print $2}'"
+    getSystemInfo['NetworkIP'] = "snmpstatus -c public -v 2c localhost | awk -F '[' '{print $3}' | awk -F ']' '{print $1}'"
 
-    with urllib.request.urlopen(url_json) as url:
-        data = json.loads(url.read().decode())
 
-    url_total = data['number_of_sensors']
+def execute_insert(collection):
+    # with urllib.request.urlopen(url_json) as url:
+    #     data = json.loads(url.read().decode())
+    reset_commands()
 
-    collection.insert_one(data)
-    client.close()
+    for i in getSystemInfo:
+        # get output from command executed
+        process = subprocess.run(getSystemInfo[i], shell=True, stdout=subprocess.PIPE)
+        getSystemInfo[i] = process.stdout.decode('utf-8')
+        print(getSystemInfo[i])
 
-    return url_total
+    # collection.insert_one(data)
+    # client.close()
 
 
 #KEEP THE SERVER RUNNING ON A LOOP
 while True:
-    url_total = 1
-    url_end = 1
 
-    # LOOP THROUGH ALL SENSORS
-    while True:
-        url_total = execute_insert(cardiac, "3")
-        execute_insert(blood, "4")
-
-        # CHANGE URL TO FETCH
-        url_end += 1
-        if(url_end > url_total-1):
-            break;
-
+    execute_insert(configs)
 
     print("Row was inserted!")
     # WAIT BEFORE RERUNNING
