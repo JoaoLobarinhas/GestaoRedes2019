@@ -1,0 +1,61 @@
+extends layout
+
+block content
+    h3=data.ip+":"+data.port
+    h5.card-text="Last Update: "+data.lastupdate
+    h5.card-text="Rep Time: "+data.repTime
+    if data.active == "true"
+        h5.text-success.card-text="Active"
+    else
+        p.text-danger.card-text="Disabled"
+    .container
+        h5="Info"
+        - var n = 0;
+        each p in data.data
+            .card.mb-4.shadow-sm
+                .card-body
+                    h5.card-title.bold="Date of Update: "+p.updateTime
+                    h5.card-text="Up Time: "+p.upTime
+                    h5.card-text="Computer Name: "+p.computerName
+                    h5.card-text="Network Ip: "+p.networkIp
+                    h5.card-text="Interfaces: "+p.interfaces
+                    h4.card-text.bold="Packets"
+                    div.collapse(id="cardInfo"+n)
+                        ul.list-group
+                            each pro in p.packets
+                                li.list-group-item="Recieved: "+pro.recvPackets
+                                li.list-group-item="Transmitted: "+pro.transPackets
+                                li.list-group-item="IP Recieved: "+pro.recvPacketsIp
+                                li.list-group-item="IP Transmitted: "+pro.transPacketsIp
+                        h4.card-text.bold="Disk"
+                        ul.list-group
+                            each disk in p.disk
+                                li.list-group-item="Space: "+disk.space+" MBs"
+                                li.list-group-item="Used Percentage: "+disk.usedPerc+"%"
+                                li.list-group-item="Space Used: "+disk.spaceused+" MBs"
+                        h4.card-text.bold="Ram"
+                        ul.list-group
+                            each ram in p.ram
+                                li.list-group-item="Size: "+ram.size+" MBs"
+                                li.list-group-item="Free Space: "+ram.freeSpace+" MBs"
+                                li.list-group-item="Used Space: "+ram.usedSpace+" MBs"
+                                li.list-group-item="Shared: "+ram.shared+" MBs"
+                                li.list-group-item="Buffer: "+ram.buffer+" MBs"
+                                li.list-group-item="Cache: "+ram.cache+" MBs"
+                        h4.card-text.bold="CPU"
+                        ul.list-group
+                            each cpu in p.cpu
+                                li.list-group-item="Usage: "+cpu.usage
+                                li.list-group-item="System Usage: "+cpu.system
+                                li.list-group-item="Idle: "+cpu.idle
+                        br
+                    button.btn.btn-secundary(type="button", data-toggle="collapse", data-target="#cardInfo"+n, aria-expanded="false", aria-controls="cardInfo"+n)="Show Info"
+                    - n++
+                    br
+        h5="Process"
+        ul.list-group.list-group-flush
+        each proc in dataU[0].uniqueValues
+            li.list-group-item
+                a.btn.btn-link(href="http://localhost:3000/"+data._id+"?name="+proc)=proc
+
+

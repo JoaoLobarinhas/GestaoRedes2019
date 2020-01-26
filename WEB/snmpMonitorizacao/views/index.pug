@@ -1,5 +1,19 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1="SNMP Configs"
+  .album.py-5.bg-light
+    each c in data
+      .card.mb-4.shadow-sm
+        .card-body
+          h4.card-title="ID: "+c._id
+          h5.card-title=c.ip+":"+c.port
+          p.card-text="Last Update: "+c.lastupdate
+          p.card-text="Rep Time: "+c.repTime
+          if c.active == "true"
+            p.text-success.card-text="Active"
+          else
+            p.text-danger.card-text="Disabled"
+          a.btn.btn-dark(href="http://localhost:3000/"+c._id)="Details"
+  
+  

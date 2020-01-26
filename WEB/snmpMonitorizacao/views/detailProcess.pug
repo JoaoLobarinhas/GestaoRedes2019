@@ -1,0 +1,12 @@
+extends layout
+
+block content
+    a.h3.text-dark(href="http://localhost:3000/"+dataId)="ID: "+dataId
+    h5=data[0].data.process.name
+    each d in data
+        .card.mb-4.shadow-sm
+            .card-body
+                h5.card-title="Date: "+d.data.updateTime
+                h5.card-text="OID: "+d.data.process.oid
+                h5.card-text="Name: "+d.data.process.name
+    
